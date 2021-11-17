@@ -1,0 +1,84 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: es-savedobject-manager
+  namespace: elk
+  labels:
+    app: es-savedobject-manager
+    environment: prod
+    owner: "sre"
+    costCenter: "sre"
+    productName: "es-savedobject-manager"
+    projectName: "automation"
+    tier: "t1default"
+spec:
+  schedule: "0 0 * * *"
+  startingDeadlineSeconds: 60
+  successfulJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: es-savedobject-manager
+          namespace: elk
+          labels:
+            app: es-savedobject-manager
+            environment: prod
+            owner: "sre"
+            costCenter: "sre"
+            productName: "es-savedobject-manager"
+            projectName: "automation"
+            tier: "t1default"
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: es-savedobject-manager
+            image: aleroxac/es-savedobject-manager:1.0.0
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 250m
+                memory: 256Mi
+            env:
+              - name: GOOGLE_APPLICATION_CREDENTIALS
+                value: /tmp/gcp-token.json
+              - name:  KIBANA_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name:  elastic-cloud-secret
+                    key:  KIBANA_HOST
+              - name:  KIBANA_PORT
+                valueFrom:
+                  secretKeyRef:
+                    name:  elastic-cloud-secret
+                    key:  KIBANA_PORT
+              - name:  ELASTIC_USERNAME
+                valueFrom:
+                  secretKeyRef:
+                    name:  elastic-cloud-secret
+                    key:  ELASTIC_USERNAME
+              - name:  ELASTIC_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name:  elastic-cloud-secret
+                    key:  ELASTIC_PASSWORD
+            volumeMounts:
+              - name: config
+                mountPath: /app/config.json
+                subPath: config.json
+              - name: gcp-token
+                mountPath: /tmp/gcp-token.json
+                subPath: gcp-token.json
+          volumes:
+            - name: config
+              configMap:
+                name: es-savedobject-manager-configmap
+                defaultMode: 0755
+            - name: gcp-token
+              secret:
+                secretName: gcp-serviceaccount-token
+                defaultMode: 0755

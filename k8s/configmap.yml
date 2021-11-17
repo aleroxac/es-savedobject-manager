@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: es-savedobject-manager-configmap
+    namespace: elk
+    labels:
+        app: es-savedobject-manager
+data:
+    config.json: |-
+        {
+            "time_zone":"America/Sao_Paulo",
+            "bucket": "bkp-kibana",
+            "cloud_provider": "gcp",
+            "kibana": {
+                "endpoint": "/api/saved_objects/_export",
+                "headers": {
+                    "kbn-version": "7.14.1",
+                    "Content-Type": "application/json",
+                    "Accept-Language": "en-US,en;q=0.9,pt;q=0.8,ko;q=0.7"
+                },
+                "payload": {
+                    "type": [
+                        "visualization",
+                        "dashboard",
+                        "lens",
+                        "search",
+                        "action",
+                        "index-pattern",
+                        "infrastructure-ui-source",
+                        "tag",
+                        "config",
+                        "url",
+                        "alert",
+                        "query",
+                        "timelion-sheet",
+                        "graph-workspace",
+                        "canvas-element",
+                        "canvas-workpad",
+                        "map",
+                        "metrics-explorer-view",
+                        "inventory-view",
+                        "apm-indices"
+                    ],
+                    "includeReferencesDeep": true
+                }
+            }
+        }

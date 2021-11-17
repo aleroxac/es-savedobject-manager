@@ -1,0 +1,13 @@
+**/.env*
+**/.git
+**/.gitignore
+**/.vscode
+**/coverage
+**/.aws
+**/.ssh
+**/.DS_Store
+**/venv
+**/env
+Dockerfile
+README.md
+docker-compose.yml
